@@ -106,4 +106,18 @@ router.delete('/exit/:id', async (req, res) => {
   }
 });
 
+router.post('/clear-not-arrived', async (req, res) => {
+  try {
+    console.log("🧹 Clearing not_arrived users..."); // add this for debugging
+    const result = await Queue.deleteMany({ status: 'not_arrived' });
+    console.log("Deleted Count:", result.deletedCount); // show how many were deleted
+    res.json({ message: 'Cleared not arrived list' });
+  } catch (err) {
+    console.error(err); // print error
+    res.status(500).json({ error: 'Failed to clear not arrived list' });
+  }
+});
+
+
+
 module.exports = router;
