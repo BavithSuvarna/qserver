@@ -8,7 +8,7 @@ router.post('/join', async (req, res) => {
     const newUser = new Queue({
       name: req.body.name,
       phone: req.body.phone,
-      status: 'waiting',
+      status: 'Waiting',
       isCurrent: false,
       joinedAt: new Date()
     });
@@ -23,7 +23,7 @@ router.post('/join', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const queue = await Queue.find({
-      status: { $in: ['waiting', 'called'] }
+      status: { $in: ['Waiting', 'Called'] }
     }).sort({ joinedAt: 1 });
 
     const notArrived = await Queue.find({ status: 'not_arrived' });
@@ -38,13 +38,13 @@ router.get('/', async (req, res) => {
 router.post('/call-next', async (req, res) => {
   try {
     // If someone is already called, return them
-    const currentUser = await Queue.findOne({ status: 'called', isCurrent: true });
+    const currentUser = await Queue.findOne({ status: 'Called', isCurrent: true });
     if (currentUser) return res.json(currentUser);
 
     // Else, call the first person waiting
     const nextUser = await Queue.findOneAndUpdate(
-      { status: 'waiting' },
-      { $set: { status: 'called', isCurrent: true } },
+      { status: 'Waiting' },
+      { $set: { status: 'Called', isCurrent: true } },
       { new: true, sort: { joinedAt: 1 } }
     );
 
@@ -85,7 +85,7 @@ router.post('/rejoin/:id', async (req, res) => {
   try {
     await Queue.findByIdAndUpdate(req.params.id, {
       $set: {
-        status: 'waiting',
+        status: 'Waiting',
         isCurrent: false,
         joinedAt: new Date()
       }
